@@ -66,11 +66,11 @@ class DetailsVC: UIViewController, UIImagePickerControllerDelegate, UINavigation
         } catch {
             print("error")
         }
-    
-        
-        
-        
+
         //context.save() //coreData ya veri kaydetmemize olanak saglayacak fonksiyon bu.
+        
+        NotificationCenter.default.post(name: NSNotification.Name("newData"), object: nil) //butun app in icine newData diye bir mesaj yollayacaktir. ViewController a gidip oradan kontrol edebiliriz.
+        self.navigationController?.popViewController(animated: true) //bir onceki ViewController a gecis
         
         
     }
