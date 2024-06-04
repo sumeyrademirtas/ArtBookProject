@@ -13,6 +13,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet weak var tableView: UITableView!
     var nameArray = [String]()
     var idArray = [UUID]()
+    var selectedPaingting = ""
+    var selectedPaintingId : UUID?
+    
     
     
     override func viewDidLoad() {
@@ -48,17 +51,19 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         do {
             let results = try context.fetch(fetchRequest)
-            
-            for result in results as! [NSManagedObject] {
-                if let name = result.value(forKey: "name")  as? String {
-                    self.nameArray.append(name)
+            if results.count > 0 {
+                for result in results as! [NSManagedObject] {
+                    if let name = result.value(forKey: "name")  as? String {
+                        self.nameArray.append(name)
+                    }
+                    
+                    if let id = result.value(forKey: "id")  as? UUID {
+                        self.idArray.append(id)
+                    }
+                    
                 }
-                
-                if let id = result.value(forKey: "id")  as? UUID {
-                    self.idArray.append(id)
-                }
-                
             }
+            
             self.tableView.reloadData() //yeni veri geldiginde kendisini guncellemesi icin
 
         } catch {
@@ -67,6 +72,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     @objc func addButtonClicked(){
+        selectedPaingting = ""
         performSegue(withIdentifier: "toDetailsVC", sender: nil)
     }
 
@@ -79,6 +85,20 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let cell = UITableViewCell()
         cell.textLabel?.text = nameArray[indexPath.row]
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toDetailsVC" {
+            let destinationVC = segue.destination as? DetailsVC
+            destinationVC?.chosenPainting = selectedPaingting
+            destinationVC?.chosenPaintingId = selectedPaintingId //secilen paintingin hem ismini hem id sini diger tarafa aktarmis oluyoruz
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedPaingting = nameArray[indexPath.row]
+        selectedPaintingId = idArray[indexPath.row]
+        performSegue(withIdentifier: "toDetailsVC", sender: nil)
     }
 
 }
